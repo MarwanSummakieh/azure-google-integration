@@ -1,5 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+<html itemscope itemtype="http://schema.org/Article">
+<head>
+  <!-- BEGIN Pre-requisites -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+  </script>
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+  </script>
+  <script>
+    function start() {
+      gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+          client_id: '378492710463-erbgvreng80r2isv3h2s44i590g73mo8.apps.googleusercontent.com',
+          // Scopes to request in addition to 'profile' and 'email'
+          //scope: 'additional_scope'
+        });
+      });
+    }
+  </script>
+</head>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -29,6 +48,43 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!-- Add where you want your sign-in button to render -->
+    <!-- Use an image that follows the branding guidelines in a real app -->
+    <button id="signinButton">Sign in with Google</button>
+    <script>
+      $('#signinButton').click(function() {
+        // signInCallback defined in step 6.
+        auth2.grantOfflineAccess().then(signInCallback);
+      });
+    </script>
+    <script>
+      function signInCallback(authResult) {
+        if (authResult['code']) {
+
+          // Hide the sign-in button now that the user is authorized, for example:
+          $('#signinButton').attr('style', 'display: none');
+
+          // Send the code to the server
+          $.ajax({
+            type: 'POST',
+            url: 'http://example.com/storeauthcode',
+            // Always include an `X-Requested-With` header in every AJAX request,
+            // to protect against CSRF attacks.
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(result) {
+              // Handle or verify the server response.
+            },
+            processData: false,
+            data: authResult['code']
+          });
+        } else {
+          // There was an error.
+        }
+      }
+    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -40,4 +96,5 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+</html>
 </html>
